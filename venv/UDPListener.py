@@ -7,6 +7,9 @@ sock.bind(("", UDP_PORT))
 while True:
     data, addr = sock.recvfrom(1024)
     data = data.decode()
+    dataArray = data.split(" ")
+
+
     print(data)
 
 
