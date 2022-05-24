@@ -1,5 +1,12 @@
 import socket
 import json
+from ambf_client import Client
+import time
+
+_client = Client()
+_client.connect()
+print(_client.get_obj_names())
+
 UDP_IP = socket.gethostbyname(socket.gethostname())
 UDP_PORT = 15002
 #print("Start")
