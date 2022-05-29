@@ -63,21 +63,30 @@ servo_cp_msg.pose.orientation.x = R_7_0.GetQuaternion()[0]
 servo_cp_msg.pose.orientation.y = R_7_0.GetQuaternion()[1]
 servo_cp_msg.pose.orientation.z = R_7_0.GetQuaternion()[2]
 servo_cp_msg.pose.orientation.w = R_7_0.GetQuaternion()[3]
-print("NOTE!!! For this example to work, please RUN the launch_crtk_interface.py script before hand.")
+# print("NOTE!!! For this example to work, please RUN the launch_crtk_interface.py script before hand.")
+
+servo_cp_msg.pose.position.x = -1
+servo_cp_msg.pose.position.y = 0.2
+servo_cp_msg.pose.position.z = -.5
+# servo_cp_pub.publish(servo_cp_msg)
 
 while not rospy.is_shutdown():
     data, addr = sock.recvfrom(1024)
     # data = data.decode()
-    if bool(data):
+    if data is not None:
+        print(data)
         dataDict = json.loads(data)
         #print(dataDict)
         #print(dataDict['slider'])
         # The following 3 lines move the robot in cartesian space
         # servo_cp_msg.pose.position.x = 0.2 * math.sin(rospy.Time.now().to_sec())
         # servo_cp_msg.pose.position.y = 0.2 * math.cos(rospy.Time.now().to_sec())
-        servo_cp_msg.pose.position.x = dataDict['x']
-        servo_cp_msg.pose.position.y = dataDict['y']
-        servo_cp_msg.pose.position.y = dataDict['z']
-        servo_cp_pub.publish(servo_cp_msg)
-
+        if 'x' in dataDict:
+            servo_cp_msg.pose.position.x = dataDict['x']
+            servo_cp_msg.pose.position.y = dataDict['y']
+            servo_cp_msg.pose.position.z = dataDict['z']
+            servo_jp_msg.position = [0., 0., 1.0, dataDict['roll'], dataDict['pitch'], dataDict['yaw']]
+            servo_cp_pub.publish(servo_cp_msg)
+            servo_jp_pub.publish(servo_jp_msg)
+            #time.sleep(0.001)
     rate.sleep()
