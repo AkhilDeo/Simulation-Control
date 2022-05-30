@@ -62,11 +62,11 @@ def list_to_sensor_msg_position(jp_list):
     msg.position = jp_list
     return msg
 
-def set_jaw_angle(self, val):
+def set_jaw_angle(val):
     msg = list_to_sensor_msg_position([val])
     jaw_jp_pub.publish(msg)
 
-def set_arm_position(self, x, y, z):
+def set_arm_position(x, y, z):
     servo_cp_msg.pose.position.x = x
     servo_cp_msg.pose.position.y = y
     servo_cp_msg.pose.position.z = z
@@ -80,15 +80,15 @@ servo_jp_msg.position = [0., 0., 1.0, 0., 0., 0.]
 servo_cp_msg = PoseStamped()
 servo_cp_msg.pose.position.z = -1.0
 R_7_0 = Rotation.RPY(3.14, 0.0, 1.57079)
-Vec = Vector(-1.0, 0.2, -0.5)
+#Will have to repeat same process of creating R_7_0 and get quaternion in loop when I implement rot/orientation
 
 servo_cp_msg.pose.orientation.x = R_7_0.GetQuaternion()[0]
 servo_cp_msg.pose.orientation.y = R_7_0.GetQuaternion()[1]
 servo_cp_msg.pose.orientation.z = R_7_0.GetQuaternion()[2]
 servo_cp_msg.pose.orientation.w = R_7_0.GetQuaternion()[3]
-servo_cp_msg.pose.position.x = -1.00
-servo_cp_msg.pose.position.y = 0.20
-servo_cp_msg.pose.position.z = -0.5
+# servo_cp_msg.pose.position.x = -1.00
+# servo_cp_msg.pose.position.y = 0.20
+# servo_cp_msg.pose.position.z = -0.5
 
 # print("NOTE!!! For this example to work, please RUN the launch_crtk_interface.py script before hand.")
 
@@ -108,7 +108,7 @@ while not rospy.is_shutdown():
         # servo_cp_msg.pose.position.x = 0.2 * math.sin(rospy.Time.now().to_sec())
         # servo_cp_msg.pose.position.y = 0.2 * math.cos(rospy.Time.now().to_sec())
         if 'x' in dataDict:
-            set_arm_position(dataDict['x'], dataDict['y'], dataDict['z'])
+            set_arm_position(dataDict['x'] - 1.0, dataDict['y'] + 0.2, dataDict['z'] - 0.41)
             set_jaw_angle(dataDict['slider'] * math.pi)
             #psm2_handle.set_joint_pos('toolyawlink-toolgripper1link', dataDict['slider'])
             #servo_jp_pub.publish(servo_jp_msg)
