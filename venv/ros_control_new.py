@@ -33,7 +33,6 @@ def measured_cp_cb(msg):
     robData.measured_cp = msg
 
 
-#rospy.init_node("sur_chal_crtk_test")
 _client = Client()
 _client.connect()
 time.sleep(0.5)
@@ -46,9 +45,6 @@ time.sleep(0.5)
 psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
 psm2.set_jaw_angle(0.8)
 time.sleep(10.0)
-# for i in range(30):
-#     psm2.set_jaw_angle(0.0)
-#     time.sleep(0.01)
 psm2.set_jaw_angle(0)
 time.sleep(5)
 psm2.set_jaw_angle(0.5)
