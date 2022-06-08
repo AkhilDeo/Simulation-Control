@@ -2,6 +2,8 @@
 # //==============================================================================
 # /*
 
+from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import JointState
 from ambf_client import Client
 import rospy
 import math
@@ -42,80 +44,28 @@ w.reset_bodies()
 time.sleep(0.2)
 psm2 = PSM(_client, 'psm2')
 time.sleep(0.5)
-psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
+# psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
+psm2.servo_jp([-0.4, -0.22, 1.39, 0, 0, 0])
 psm2.set_jaw_angle(0.8)
 time.sleep(10.0)
 psm2.set_jaw_angle(0)
 time.sleep(5)
 psm2.set_jaw_angle(0.5)
 time.sleep(5)
-psm2.servo_jp([-0.4, -0.22, 1.39, 1, -0.37, -0.11])
-time.sleep(5)
-psm2.servo_jp([-0.4, -0.22, 1.39, 1, 1, -0.11])
-time.sleep(5)
-psm2.servo_jp([-0.4, -0.22, 1.39, 1, 1, 1])
-time.sleep(5)
-rate = rospy.Rate(200)
-
-
-# psm2_handle = _client.get_obj_handle('/ambf/env/psm2/baselink')
-# namespace = "/CRTK/"
-# arm_name = "psm2"
-# measured_js_name = namespace + arm_name + "/measured_js"
-# measured_cp_name = namespace + arm_name + "/measured_cp"
-# servo_jp_name = namespace + arm_name + "/servo_jp"
-# servo_cp_name = namespace + arm_name + "/servo_cp"
-# jaw_name = namespace + arm_name + '/jaw/' + 'servo_jp'
-#
-#
-# measured_js_sub = rospy.Subscriber(measured_js_name, JointState, measured_js_cb, queue_size=1)
-# measured_cp_sub = rospy.Subscriber(measured_cp_name, PoseStamped, measured_cp_cb, queue_size=1)
-#
-# servo_jp_pub = rospy.Publisher(servo_jp_name, JointState, queue_size=1)
-# servo_cp_pub = rospy.Publisher(servo_cp_name, PoseStamped, queue_size=1)
-# jaw_jp_pub = rospy.Publisher(jaw_name, JointState, queue_size=1)
-
-# def list_to_sensor_msg_position(jp_list):
-#     msg = JointState()
-#     msg.position = jp_list
-#     return msg
-#
-# def set_jaw_angle(val):
-#     msg = list_to_sensor_msg_position([val])
-#     jaw_jp_pub.publish(msg)
-#
-# def set_arm_position(x, y, z):
-#     servo_cp_msg.pose.position.x = x
-#     servo_cp_msg.pose.position.y = y
-#     servo_cp_msg.pose.position.z = z
-#     servo_cp_pub.publish(servo_cp_msg)
-
-
-#
-# servo_jp_msg = JointState()
-# servo_jp_msg.position = [0., 0., 1.0, 0., 0., 0.]
-#
-# servo_cp_msg = PoseStamped()
-# servo_cp_msg.pose.position.z = -1.0
-# R_7_0 = Rotation.RPY(3.14, 0.0, 1.57079)
-#Will have to repeat same process of creating R_7_0 and get quaternion in loop when I implement rot/orientation
-
-# servo_cp_msg.pose.orientation.x = R_7_0.GetQuaternion()[0]
-# servo_cp_msg.pose.orientation.y = R_7_0.GetQuaternion()[1]
-# servo_cp_msg.pose.orientation.z = R_7_0.GetQuaternion()[2]
-# servo_cp_msg.pose.orientation.w = R_7_0.GetQuaternion()[3]
-
-# print("NOTE!!! For this example to work, please RUN the launch_crtk_interface.py script before hand.")
-
-
-# while not rospy.is_shutdown():
-#     data, addr = sock.recvfrom(1024)
-#     if data is not None:
-#         print(data)
-#         dataDict = json.loads(data)
-#         if 'x' in dataDict:
-#             set_arm_position(dataDict['x'] - 1.05, dataDict['y'] - 0.1, dataDict['z'] - 0.5)
-#             #set_jaw_angle(dataDict['slider'] * math.pi)
-#             #psm2_handle.set_joint_pos('toolyawlink-toolgripper1link', dataDict['slider'])
-#             #servo_jp_pub.publish(servo_jp_msg)
-#     rate.sleep()
+# psm2.servo_jp([-0.4, -0.22, 1.39, 1, -0.37, -0.11])
+# time.sleep(5)
+# psm2.servo_jp([-0.4, -0.22, 1.39, -3, -0.37, -0.11])
+# time.sleep(5)
+# psm2.servo_jp([-0.4, -0.22, 1.39, 3, -0.37, -0.11])
+# time.sleep(5)
+print("Starting TeleOp")
+rate = rospy.Rate(10)
+while not rospy.is_shutdown():
+    data, addr = sock.recvfrom(1024)
+    if data is not None:
+        dataDict = json.loads(data)
+        if 'x' in dataDict:
+            psm2.servo_jp([dataDict['x'] - 0.4, dataDict['y']-0.22, dataDict['z'] + 1.39, dataDict['roll'], dataDict['pitch'], dataDict['yaw']])
+        psm2.set_jaw_angle(dataDict['slider'])
+            #servo_jp_pub.publish(servo_jp_msg)
+    rate.sleep()
