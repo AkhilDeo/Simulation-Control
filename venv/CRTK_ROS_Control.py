@@ -12,6 +12,7 @@ from PyKDL import Rotation, Frame, Vector
 import socket
 import json
 import time
+from psm_arm import PSM
 
 UDP_IP = socket.gethostbyname(socket.gethostname())
 UDP_PORT = 15002
@@ -30,7 +31,6 @@ robData = RobotData()
 
 def measured_js_cb(msg):
     robData.measured_js = msg
-
 
 def measured_cp_cb(msg):
     robData.measured_cp = msg
@@ -72,7 +72,7 @@ def set_arm_position(x, y, z):
     servo_cp_msg.pose.position.z = z
     servo_cp_pub.publish(servo_cp_msg)
 
-rate = rospy.Rate(50)
+rate = rospy.Rate(30)
 
 servo_jp_msg = JointState()
 servo_jp_msg.position = [0., 0., 1.0, 0., 0., 0.]
@@ -108,8 +108,8 @@ while not rospy.is_shutdown():
         # servo_cp_msg.pose.position.x = 0.2 * math.sin(rospy.Time.now().to_sec())
         # servo_cp_msg.pose.position.y = 0.2 * math.cos(rospy.Time.now().to_sec())
         if 'x' in dataDict:
-            set_arm_position(dataDict['x'] - 1.0, dataDict['y'] + 0.2, dataDict['z'] - 0.41)
-            set_jaw_angle(dataDict['slider'] * math.pi)
+            set_arm_position(dataDict['x'] - 1.05, dataDict['y'] - 0.1, dataDict['z'] - 0.5)
+            #set_jaw_angle(dataDict['slider'] * math.pi)
             #psm2_handle.set_joint_pos('toolyawlink-toolgripper1link', dataDict['slider'])
             #servo_jp_pub.publish(servo_jp_msg)
             #time.sleep(0.001)
