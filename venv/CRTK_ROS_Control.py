@@ -12,7 +12,6 @@ from PyKDL import Rotation, Frame, Vector
 import socket
 import json
 import time
-from psm_arm import PSM
 
 UDP_IP = socket.gethostbyname(socket.gethostname())
 UDP_PORT = 15002
