@@ -2,9 +2,6 @@
 # //==============================================================================
 # /*
 
-from geometry_msgs.msg import PoseStamped
-from sensor_msgs.msg import JointState
-from geometry_msgs.msg import TwistStamped
 from ambf_client import Client
 import rospy
 import math
@@ -44,16 +41,27 @@ print(_client.get_obj_names())
 w = _client.get_world_handle()
 w.reset_bodies()
 time.sleep(0.2)
-psm2 = PSM(c, 'psm2')
+psm2 = PSM(_client, 'psm2')
 time.sleep(0.5)
 psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
 psm2.set_jaw_angle(0.8)
 time.sleep(10.0)
-for i in range(30):
-    psm2.set_jaw_angle(0.0)
-    time.sleep(0.01)
-time.sleep(0.5)
-psm2.set_jaw_angle(0.8)
+# for i in range(30):
+#     psm2.set_jaw_angle(0.0)
+#     time.sleep(0.01)
+psm2.set_jaw_angle(0)
+time.sleep(5)
+psm2.set_jaw_angle(0.5)
+time.sleep(5)
+psm2.servo_jp([-0.4, -0.22, 1.39, 1, -0.37, -0.11])
+time.sleep(5)
+psm2.servo_jp([-0.4, -0.22, 1.39, 1, 1, -0.11])
+time.sleep(5)
+psm2.servo_jp([-0.4, -0.22, 1.39, 1, 1, 1])
+time.sleep(5)
+rate = rospy.Rate(200)
+
+
 # psm2_handle = _client.get_obj_handle('/ambf/env/psm2/baselink')
 # namespace = "/CRTK/"
 # arm_name = "psm2"
@@ -71,22 +79,22 @@ psm2.set_jaw_angle(0.8)
 # servo_cp_pub = rospy.Publisher(servo_cp_name, PoseStamped, queue_size=1)
 # jaw_jp_pub = rospy.Publisher(jaw_name, JointState, queue_size=1)
 
-def list_to_sensor_msg_position(jp_list):
-    msg = JointState()
-    msg.position = jp_list
-    return msg
+# def list_to_sensor_msg_position(jp_list):
+#     msg = JointState()
+#     msg.position = jp_list
+#     return msg
+#
+# def set_jaw_angle(val):
+#     msg = list_to_sensor_msg_position([val])
+#     jaw_jp_pub.publish(msg)
+#
+# def set_arm_position(x, y, z):
+#     servo_cp_msg.pose.position.x = x
+#     servo_cp_msg.pose.position.y = y
+#     servo_cp_msg.pose.position.z = z
+#     servo_cp_pub.publish(servo_cp_msg)
 
-def set_jaw_angle(val):
-    msg = list_to_sensor_msg_position([val])
-    jaw_jp_pub.publish(msg)
 
-def set_arm_position(x, y, z):
-    servo_cp_msg.pose.position.x = x
-    servo_cp_msg.pose.position.y = y
-    servo_cp_msg.pose.position.z = z
-    servo_cp_pub.publish(servo_cp_msg)
-
-# rate = rospy.Rate(30)
 #
 # servo_jp_msg = JointState()
 # servo_jp_msg.position = [0., 0., 1.0, 0., 0., 0.]
