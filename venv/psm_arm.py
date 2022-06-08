@@ -9,11 +9,11 @@ jpRecorder = JointPosRecorder()
 
 class PSMJointMapping:
     def __init__(self):
-        self.idx_to_name = {0: 'baselink-yawlink',
-                            1: 'yawlink-pitchbacklink',
-                            2: 'pitchendlink-maininsertionlink',
-                            3: 'maininsertionlink-toolrolllink',
-                            4: 'toolrolllink-toolpitchlink',
+        self.idx_to_name = {0: 'baselink-yawlink', #-1.605 to 1.599
+                            1: 'yawlink-pitchbacklink', #
+                            2: 'pitchendlink-maininsertionlink', #0 to 0.24
+                            3: 'maininsertionlink-toolrolllink', # -3.0543 to 3.0543
+                            4: 'toolrolllink-toolpitchlink', # -1.571 to 1.571
                             5: 'toolpitchlink-toolyawlink'}
 
         self.name_to_idx = {'baselink-yawlink': 0,
@@ -33,9 +33,9 @@ class PSM:
         self.client = client
         self.name = name
         self.base = self.client.get_obj_handle(name + '/baselink')
-        self.target_IK = self.client.get_obj_handle(name + '_target_ik')
-        self.palm_joint_IK = self.client.get_obj_handle(name + '_palm_joint_ik')
-        self.target_FK = self.client.get_obj_handle(name + '_target_fk')
+        # self.target_IK = self.client.get_obj_handle(name + '_target_ik')
+        # self.palm_joint_IK = self.client.get_obj_handle(name + '_palm_joint_ik')
+        # self.target_FK = self.client.get_obj_handle(name + '_target_fk')
         self.sensor = self.client.get_obj_handle(name + '/Sensor0')
         self.actuators = []
         self.actuators.append(self.client.get_obj_handle(name + '/Actuator0'))
@@ -43,7 +43,7 @@ class PSM:
         self.grasped = [False, False, False]
         self.graspable_objs_prefix = ["Needle", "Thread", "Puzzle"]
 
-        self.T_t_b_home = Frame(Rotation.RPY(3.14, 0.0, 1.57079), Vector(-1.0, 0.2, -0.5))
+        self.T_t_b_home = Frame(Rotation.RPY(3.14, 0.0, 1.57079), Vector(-0.4, -0.22, 1.39))
 
         # Transform of Base in World
         self._T_b_w = None
@@ -152,7 +152,7 @@ class PSM:
         self.base.set_joint_vel(5, jv[5])
 
     def set_jaw_angle(self, jaw_angle):
-        self.base.set_joint_pos('toolyawlink-toolgripper1link', jaw_angle)
+        self.base.set_joint_pos('toolyawlink-toolgripper1link', jaw_angle) # 0 to 1 (I think)
         self.base.set_joint_pos('toolyawlink-toolgripper2link', jaw_angle)
         self.run_grasp_logic(jaw_angle)
 
