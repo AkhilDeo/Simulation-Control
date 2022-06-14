@@ -71,15 +71,18 @@ psm2 = PSM(_client, 'psm2')
 # time.sleep(5)
 print("Starting TeleOp")
 rate = rospy.Rate(250)
-cur_slider = 0.5
+cur_slider = 0.4
 while not rospy.is_shutdown():
     data, addr = sock.recvfrom(1024)
     if data is not None:
         dataDict = json.loads(data)
         if 'x' in dataDict:
-            #psm2.servo_jp([dataDict['x'] - 0.4, (dataDict['y'] * -1) - 0.22, (dataDict['z'] * -1) + 1.39, (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
-            T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
-            psm2.servo_cp(T_t_b)
+            psm2.servo_jp([dataDict['x'] - 0.4, (dataDict['y'] * -1) - 0.22, (dataDict['z'] * -1) + 1.39, (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
+            #T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
+            # T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']),
+                          # Vector(dataDict['x'], dataDict['y'] * -1, dataDict['z'] + 1))
+            print(dataDict)
+            #psm2.servo_cp(T_t_b)
         if dataDict['slider'] != cur_slider:
             psm2.set_jaw_angle(dataDict['slider'])
             cur_slider = dataDict['slider']
