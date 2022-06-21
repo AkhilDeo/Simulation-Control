@@ -85,7 +85,6 @@ while not rospy.is_shutdown():
             #T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
             # T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']),
                           # Vector(dataDict['x'], dataDict['y'] * -1, dataDict['z'] + 1))
-            #print(dataDict)
             #psm2.servo_cp(T_t_b)
         if dataDict['slider'] != cur_slider:
             robot_arm.set_jaw_angle(dataDict['slider'])
