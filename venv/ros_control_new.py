@@ -40,7 +40,10 @@ _client.connect()
 #print(_client.get_obj_names())
 w = _client.get_world_handle()
 w.reset_bodies()
-psm2 = PSM(_client, 'psm2')
+psm_left = PSM(_client, 'psm1')
+psm_right = PSM(_client, 'psm2')
+psm_arms = {"left": psm_left,
+            "right": psm_right}
 # psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
 # psm2.servo_jp([-0.4, -0.22, 1.39, 0, 0, 0])
 # time.sleep(0.5)
@@ -76,14 +79,15 @@ while not rospy.is_shutdown():
     data, addr = sock.recvfrom(1024)
     if data is not None:
         dataDict = json.loads(data)
+        robot_arm = psm_arms[dataDict['arm']]
         if 'x' in dataDict:
-            psm2.servo_jp([dataDict['x'] * 1.25 - 0.5, (dataDict['y'] * -1.25) - 0.1, (dataDict['z'] * -1.25) + 1.39, (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
+            robot_arm.servo_jp([dataDict['x'] * 1.25 - 0.5, (dataDict['y'] * -1.25) - 0.1, (dataDict['z'] * -1.25) + 1.39, (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
             #T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
             # T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']),
                           # Vector(dataDict['x'], dataDict['y'] * -1, dataDict['z'] + 1))
             #print(dataDict)
             #psm2.servo_cp(T_t_b)
         if dataDict['slider'] != cur_slider:
-            psm2.set_jaw_angle(dataDict['slider'])
+            robot_arm.set_jaw_angle(dataDict['slider'])
             cur_slider = dataDict['slider']
     rate.sleep()
