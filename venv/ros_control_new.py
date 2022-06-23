@@ -81,11 +81,19 @@ while not rospy.is_shutdown():
         dataDict = json.loads(data)
         robot_arm = psm_arms[dataDict['arm']]
         if 'x' in dataDict:
-            robot_arm.servo_jp([dataDict['x'] * 1.25 - 0.5, (dataDict['y'] * -1.25) - 0.1, (dataDict['z'] * -1.25) + 1.39, (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
-            #T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
-            # T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']),
+            if dataDict['arm'] == 'right':
+                robot_arm.servo_jp(
+                    [dataDict['x'] * 1.25 - 0.5, (dataDict['y'] * -1.25) - 0.1, (dataDict['z'] * -1.25) + 1.39,
+                                    (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
+                #T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
+                # T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']),
                           # Vector(dataDict['x'], dataDict['y'] * -1, dataDict['z'] + 1))
-            #psm2.servo_cp(T_t_b)
+                #psm2.servo_cp(T_t_b)
+            else:
+                robot_arm.servo_jp(
+                    [dataDict['x'] * 1.25 + 0.6, (dataDict['y'] * -1.25) + 0.1, (dataDict['z'] * -1.25) + 1.39,
+                     (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), -1 * dataDict['yaw']])
+
         if dataDict['slider'] != cur_slider:
             robot_arm.set_jaw_angle(dataDict['slider'])
             cur_slider = dataDict['slider']
