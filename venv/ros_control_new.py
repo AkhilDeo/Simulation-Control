@@ -74,7 +74,7 @@ psm_arms = {"left": psm_left,
 # time.sleep(5)
 print("Starting TeleOp")
 rate = rospy.Rate(250)
-cur_slider = 0.4
+cur_slider = 0.5
 while not rospy.is_shutdown():
     data, addr = sock.recvfrom(1024)
     if data is not None:
@@ -82,13 +82,13 @@ while not rospy.is_shutdown():
         robot_arm = psm_arms[dataDict['arm']]
         if 'x' in dataDict:
             if dataDict['arm'] == 'right':
-                robot_arm.servo_jp(
-                    [dataDict['x'] * 1.25 - 0.5, (dataDict['y'] * -1.25) - 0.1, (dataDict['z'] * -1.25) + 1.39,
-                                    (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
-                #T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']), Vector((dataDict['z'] * -1) + 1.39, (dataDict['y'] * -1) - 0.22, dataDict['x'] - 0.4))
-                # T_t_b = Frame(Rotation.RPY((dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']),
-                          # Vector(dataDict['x'], dataDict['y'] * -1, dataDict['z'] + 1))
-                #psm2.servo_cp(T_t_b)
+                # robot_arm.servo_jp(
+                #     [dataDict['x'] * 1.25 - 0.5, (dataDict['y'] * -1.25) - 0.1, (dataDict['z'] * -1.25) + 1.39,
+                #                     (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), dataDict['yaw']])
+                self.cmd_rpy = Rotation.RPY(dataDict['roll'], dataDict['pitch'], dataDict['yaw'])
+                self.cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'])
+                self.T_IK = Frame(self.cmd_rpy, self.cmd_xyz)
+                robot_arm.servo_cp(self.T_IK)
             else:
                 robot_arm.servo_jp(
                     [dataDict['x'] * 1.25 + 0.6, (dataDict['y'] * -1.25) + 0.1, (dataDict['z'] * -1.25) + 1.39,
