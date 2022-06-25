@@ -49,7 +49,8 @@ psm_arms = {"left": psm1,
 # The PSMs can be controlled either in joint space or cartesian space. For the
 # latter, the `servo_cp` command sets the end-effector pose w.r.t its Base frame.
 
-T_e_b = Frame(Rotation.RPY(np.pi, 0, np.pi/2.), Vector(0., 0., -1.3))
+# T_e_b = Frame(Rotation.RPY(np.pi, 0, np.pi/2.), Vector(0., 0., -1.3))
+T_e_b = Frame(Rotation.RPY(np.pi / 2.0, 0, np.pi/2.), Vector(0., 0., -1.3))
 print("Setting the end-effector frame of PSM1 w.r.t Base", T_e_b)
 psm1.servo_cp(T_e_b)
 psm1.set_jaw_angle(0.2)
@@ -104,9 +105,10 @@ while not rospy.is_shutdown():
                 T_IK = Frame(cmd_rpy, cmd_xyz)
                 robot_arm.servo_cp(T_IK)
             else:
-                robot_arm.servo_jp(
-                    [dataDict['x'] * 1.25 + 0.6, (dataDict['y'] * -1.25) + 0.1, (dataDict['z'] * -1.25) + 1.39,
-                     (dataDict['roll'] * -1.5), (dataDict['pitch'] * 1.5), -1 * dataDict['yaw']])
+                cmd_rpy = Rotation.RPY(1 * dataDict['yaw'], dataDict['pitch'], dataDict['roll'])
+                cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
+                T_IK = Frame(cmd_rpy, cmd_xyz)
+                robot_arm.servo_cp(T_IK)
 
         if dataDict['slider'] != cur_slider:
             robot_arm.set_jaw_angle(dataDict['slider'])
