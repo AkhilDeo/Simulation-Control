@@ -43,6 +43,7 @@ w = _client.get_world_handle()
 w.reset_bodies()
 psm1 = PSM(_client, 'psm1')
 psm2 = PSM(_client, 'psm2')
+ecm = ECM(my_client, 'CameraFrame')
 psm_arms = {"left": psm1,
             "right": psm2}
 
@@ -60,6 +61,10 @@ print("Setting the end-effector frame of PSM2 w.r.t Base", T_e_b)
 psm2.servo_cp(T_e_b)
 psm2.set_jaw_angle(0.5)
 time.sleep(1.0)
+jp = [0., 0.2, -0.3, 0.2]
+print("Setting ECM joint positions to ", jp)
+ecm.servo_jp(jp)
+time.sleep(5.0)
 
 # Servo_jp testing
 # psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
