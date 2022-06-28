@@ -110,9 +110,9 @@ while not rospy.is_shutdown():
     if data is not None:
         dataDict = json.loads(data)
         robot_arm = psm_arms[dataDict['arm']]
-        if 'x' in dataDict:
-            # if dataDict['cameraBtn']:
-            #     print("Camera Pressed")
+        if 'camera' in dataDict:
+            ecm.servo_jp([dataDict['yaw'], dataDict['pitch'], dataDict['insert'], dataDict['roll']])
+        elif 'x' in dataDict:
             if dataDict['arm'] == 'right':
                 cmd_rpy = Rotation.RPY(-1 * dataDict['yaw'] + np.pi, dataDict['pitch'], dataDict['roll'])
                 cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
@@ -123,9 +123,6 @@ while not rospy.is_shutdown():
                 cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
                 T_IK = Frame(cmd_rpy, cmd_xyz)
                 robot_arm.servo_cp(T_IK)
-
-
-
         if dataDict['slider'] != cur_slider:
             robot_arm.set_jaw_angle(dataDict['slider'])
             cur_slider = dataDict['slider']
