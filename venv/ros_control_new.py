@@ -13,6 +13,7 @@ import time
 from psm_arm import PSM
 from ecm_arm import ECM
 import numpy as np
+import sys, signal
 
 
 UDP_IP = socket.gethostbyname(socket.gethostname())
@@ -99,35 +100,36 @@ time.sleep(5.0)
 # time.sleep(5)
 # psm2.servo_jp([-0.4, -0.22, 1.39, 3, -0.37, -0.11])
 # time.sleep(5)
-def signal_handler(sig, frame):
+
+
+def signal_handler(signum, frame):
     print("Ctrl+C clicked!")
     sys.exit(0)
 
+signal.signal(signal.SIGINT, signal_handler)
+
 print("Starting TeleOp")
-rate = rospy.Rate(60)
+rate = rospy.Rate(50)
 cur_slider = 0.4
 while True:
-    try:
-        data, addr = sock.recvfrom(1024)
-        if data is not None:
-            dataDict = json.loads(data)
-            if dataDict['camera'] == 'true':
-                ecm.servo_jp([dataDict['yaw'], dataDict['pitch'], dataDict['insert'], dataDict['roll']])
-            elif 'x' in dataDict:
-                robot_arm = psm_arms[dataDict['arm']]
-                if dataDict['arm'] == 'right':
-                    cmd_rpy = Rotation.RPY(-1 * dataDict['yaw'] + np.pi, dataDict['pitch'], dataDict['roll'])
-                    cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
-                    T_IK = Frame(cmd_rpy, cmd_xyz)
-                    robot_arm.servo_cp(T_IK)
-                else:
-                    cmd_rpy = Rotation.RPY(1 * dataDict['yaw'], dataDict['pitch'], dataDict['roll'])
-                    cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
-                    T_IK = Frame(cmd_rpy, cmd_xyz)
-                    robot_arm.servo_cp(T_IK)
-                if dataDict['slider'] != cur_slider:
-                    robot_arm.set_jaw_angle(dataDict['slider'])
-                    cur_slider = dataDict['slider']
-        rate.sleep()
-    except KeyboardInterrupt:
-        sys.exit(0)
+    data, addr = sock.recvfrom(1024)
+    if data is not None:
+        dataDict = json.loads(data)
+        if dataDict['camera'] == 'true':
+            ecm.servo_jp([dataDict['yaw'], dataDict['pitch'], dataDict['insert'], dataDict['roll']])
+        elif 'x' in dataDict:
+            robot_arm = psm_arms[dataDict['arm']]
+            if dataDict['arm'] == 'right':
+                cmd_rpy = Rotation.RPY(-1 * dataDict['yaw'] + np.pi, dataDict['pitch'], dataDict['roll'])
+                cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
+                T_IK = Frame(cmd_rpy, cmd_xyz)
+                robot_arm.servo_cp(T_IK)
+            else:
+                cmd_rpy = Rotation.RPY(1 * dataDict['yaw'], dataDict['pitch'], dataDict['roll'])
+                cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
+                T_IK = Frame(cmd_rpy, cmd_xyz)
+                robot_arm.servo_cp(T_IK)
+            if dataDict['slider'] != cur_slider:
+                robot_arm.set_jaw_angle(dataDict['slider'])
+                cur_slider = dataDict['slider']
+    rate.sleep()
