@@ -125,9 +125,9 @@ while True:
                 cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
                 T_IK = Frame(cmd_rpy, cmd_xyz)
                 robot_arm.servo_cp(T_IK)
-
             else:
-                cmd_rpy = Rotation.RPY(1 * dataDict['yaw'], dataDict['pitch'], dataDict['roll'])
+                cmd_rpy = Rotation.RPY(-1 * dataDict['pitch'],
+                                       dataDict['yaw'], dataDict['roll'] + (np.pi / 4))
                 cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
                 T_IK = Frame(cmd_rpy, cmd_xyz)
                 robot_arm.servo_cp(T_IK)
