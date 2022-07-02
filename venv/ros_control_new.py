@@ -108,8 +108,9 @@ def signal_handler(signum, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
+
 print("Starting TeleOp")
-rate = rospy.Rate(50)
+rate = rospy.Rate(60)
 cur_slider = 0.4
 while True:
     data, addr = sock.recvfrom(1024)
@@ -120,10 +121,11 @@ while True:
         elif 'x' in dataDict:
             robot_arm = psm_arms[dataDict['arm']]
             if dataDict['arm'] == 'right':
-                cmd_rpy = Rotation.RPY(-1 * dataDict['yaw'] + np.pi, dataDict['pitch'], dataDict['roll'])
+                cmd_rpy = Rotation.RPY(dataDict['pitch'], -1 * dataDict['yaw'] + np.pi, dataDict['roll'] - (np.pi / 4))
                 cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
                 T_IK = Frame(cmd_rpy, cmd_xyz)
                 robot_arm.servo_cp(T_IK)
+
             else:
                 cmd_rpy = Rotation.RPY(1 * dataDict['yaw'], dataDict['pitch'], dataDict['roll'])
                 cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
