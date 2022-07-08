@@ -13,16 +13,19 @@ import time
 from psm_arm import PSM
 from ecm_arm import ECM
 import numpy as np
-import sys, signal
+import sys
+import signal
 
 
 UDP_IP = socket.gethostbyname(socket.gethostname())
 UDP_PORT = 15002
-#print("Start")
+# print("Start")
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(("", UDP_PORT))
 
+
 class RobotData:
+
     def __init__(self):
         self.measured_js = JointState()
         self.measured_cp = PoseStamped()
@@ -33,6 +36,7 @@ robData = RobotData()
 
 def measured_js_cb(msg):
     robData.measured_js = msg
+
 
 def measured_cp_cb(msg):
     robData.measured_cp = msg
@@ -70,9 +74,11 @@ ecm.servo_jp(jp)
 print('ECM pose in World', ecm.measured_cp())
 time.sleep(5.0)
 
+
 def signal_handler(signum, frame):
     print("Ctrl+C clicked!")
     sys.exit(0)
+
 
 signal.signal(signal.SIGINT, signal_handler)
 
