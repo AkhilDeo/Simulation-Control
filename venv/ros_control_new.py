@@ -70,38 +70,6 @@ ecm.servo_jp(jp)
 print('ECM pose in World', ecm.measured_cp())
 time.sleep(5.0)
 
-
-# Servo_jp testing
-# psm2.servo_jp([-0.4, -0.22, 1.39, -1.64, -0.37, -0.11])
-# psm2.servo_jp([-0.4, -0.22, 1.39, 0, 0, 0])
-# time.sleep(0.5)
-# psm2.set_jaw_angle(0.5)
-# time.sleep(5)
-# print("Roll testing")
-# psm2.servo_jp([-0.4, -0.22, 1.39, -3.05, 0, 0])
-# time.sleep(5)
-# psm2.servo_jp([-0.4, -0.22, 1.39, 3.05, 0, 0])
-# time.sleep(5)
-# print("Pitch testing")
-# psm2.servo_jp([-0.4, -0.22, 1.39, 0, -1.57, 0])
-# time.sleep(5)
-# psm2.servo_jp([-0.4, -0.22, 1.39, 0, 1.57, 0])
-# time.sleep(5)
-# print("Yaw testing")
-# psm2.servo_jp([-0.4, -0.22, 1.39, 0, 0, -1])
-# time.sleep(5)
-# psm2.servo_jp([-0.4, -0.22, 1.39, 0, 0, 1])
-# time.sleep(5)
-
-
-# psm2.servo_jp([-0.4, -0.22, 1.39, 1, -0.37, -0.11])
-# time.sleep(5)
-# psm2.servo_jp([-0.4, -0.22, 1.39, -3, -0.37, -0.11])
-# time.sleep(5)
-# psm2.servo_jp([-0.4, -0.22, 1.39, 3, -0.37, -0.11])
-# time.sleep(5)
-
-
 def signal_handler(signum, frame):
     print("Ctrl+C clicked!")
     sys.exit(0)

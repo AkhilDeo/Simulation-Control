@@ -18,7 +18,7 @@ class ECM:
         self._T_w_c = None
         self._pose_changed = True
         self._num_joints = 5
-        self._update_camera_pose()
+        self.update_camera_pose()
         self._T_c_w_init = self._T_c_w
         self._measured_jp = np.array([.0, .0, .0, .0])
         self._measured_cp = None
@@ -55,11 +55,11 @@ class ECM:
             return True
 
     def get_T_c_w(self):
-        self._update_camera_pose()
+        self.update_camera_pose()
         return self._T_c_w
 
     def get_T_w_c(self):
-        self._update_camera_pose()
+        self.update_camera_pose()
         return self._T_w_c
 
     def has_pose_changed(self):
@@ -68,7 +68,7 @@ class ECM:
     def set_pose_changed(self):
         self._pose_changed = True
 
-    def _update_camera_pose(self):
+    def update_camera_pose(self):
         p = self.camera_handle.get_pos()
         q = self.camera_handle.get_rot()
         P_c_w = Vector(p.x, p.y, p.z)
