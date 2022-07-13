@@ -57,27 +57,33 @@ psm_arms = {"left": psm1,
 # latter, the `servo_cp` command sets the end-effector pose w.r.t its Base frame.
 
 # T_e_b = Frame(Rotation.RPY(np.pi, 0, np.pi/2.), Vector(0., 0., -1.3))
-T_e_b = Frame(Rotation.RPY(np.pi / 2.0, 0, np.pi/2.), Vector(0., 0., -1.3))
-print("Setting the end-effector frame of PSM1 w.r.t Base", T_e_b)
-psm1.servo_cp(T_e_b)
-psm1.set_jaw_angle(0.2)
-time.sleep(1.0)
-T_e_b = Frame(Rotation.RPY(np.pi, 0, np.pi/4.), Vector(0.1, -0.1, -1.3))
-print("Setting the end-effector frame of PSM2 w.r.t Base", T_e_b)
-psm2.servo_cp(T_e_b)
-psm2.set_jaw_angle(0.5)
-time.sleep(1.0)
-# jp = [0., 0.2, -0.3, 0.2]
-jp = [0.0, 0.0, 0.0, 0.0]
-print("Setting ECM joint positions to ", jp)
-ecm.servo_jp(jp)
-print('ECM pose in World', ecm.measured_cp())
-time.sleep(5.0)
+# T_e_b = Frame(Rotation.RPY(np.pi / 2.0, 0, np.pi/2.), Vector(0., 0., -1.3))
+# print("Setting the end-effector frame of PSM1 w.r.t Base", T_e_b)
+# psm1.servo_cp(T_e_b)
+# psm1.set_jaw_angle(0.2)
+# time.sleep(1.0)
+# T_e_b = Frame(Rotation.RPY(np.pi, 0, np.pi/4.), Vector(0.1, -0.1, -1.3))
+# print("Setting the end-effector frame of PSM2 w.r.t Base", T_e_b)
+# psm2.servo_cp(T_e_b)
+# psm2.set_jaw_angle(0.5)
+# time.sleep(1.0)
+# # jp = [0., 0.2, -0.3, 0.2]
+# jp = [0.0, 0.0, 0.0, 0.0]
+# print("Setting ECM joint positions to ", jp)
+# ecm.servo_jp(jp)
+# print('ECM pose in World', ecm.measured_cp())
+# time.sleep(1.0)
+# print("TEST ECM cartesian movement", jp)
+# jp3 = Rotation.RPY(2, 0, 0)
+# jp4 = Vector(0, 1, 0)
+# jp2 = Frame(jp3, jp4)
+# ecm.servo_cp(jp2)
+# time.sleep(5.0)
 
 
 def signal_handler(signum, frame):
-    print("Ctrl+C clicked!")
-    sys.exit(0)
+    print("\nCtrl+C clicked!")
+    exit(1)
 
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -92,19 +98,20 @@ while True:
         dataDict = json.loads(data)
         if dataDict['camera'] == 'true':
             ecm.servo_jp([dataDict['yaw'], dataDict['pitch'], dataDict['insert'], dataDict['roll']])
+            # cam_rpy = Rotation.RPY(dataDict['pitch'], dataDict['yaw'], dataDict['roll'])
+            # cam_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'])
+            # ecm.servo_cp(Frame(cam_rpy, cam_xyz))
         elif 'x' in dataDict:
             robot_arm = psm_arms[dataDict['arm']]
             if dataDict['arm'] == 'right':
                 cmd_rpy = Rotation.RPY(dataDict['pitch'], -1 * dataDict['yaw'] + np.pi, dataDict['roll'] - (np.pi / 4))
                 cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
-                T_IK = Frame(cmd_rpy, cmd_xyz)
-                robot_arm.servo_cp(T_IK)
+                robot_arm.servo_cp(Frame(cmd_rpy, cmd_xyz))
             else:
                 cmd_rpy = Rotation.RPY(-1 * dataDict['pitch'],
                                        dataDict['yaw'], dataDict['roll'] + (np.pi / 4))
                 cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
-                T_IK = Frame(cmd_rpy, cmd_xyz)
-                robot_arm.servo_cp(T_IK)
+                robot_arm.servo_cp(Frame(cmd_rpy, cmd_xyz))
             if dataDict['slider'] != cur_slider:
                 robot_arm.set_jaw_angle(dataDict['slider'])
                 cur_slider = dataDict['slider']
