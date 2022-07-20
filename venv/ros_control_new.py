@@ -91,28 +91,28 @@ signal.signal(signal.SIGINT, signal_handler)
 
 print("Starting TeleOp")
 rate = rospy.Rate(60)
-cur_slider = 0.4
+cur_slider_left = 0.4
+cur_slider_right = 0.4
 while True:
     data, addr = sock.recvfrom(1024)
     if data is not None:
-        dataDict = json.loads(data)
-        if dataDict['camera'] == 'true':
-            ecm.servo_jp([dataDict['yaw'], dataDict['pitch'], dataDict['insert'], dataDict['roll']])
-            # cam_rpy = Rotation.RPY(dataDict['pitch'], dataDict['yaw'], dataDict['roll'])
-            # cam_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'])
-            # ecm.servo_cp(Frame(cam_rpy, cam_xyz))
-        elif 'x' in dataDict:
-            robot_arm = psm_arms[dataDict['arm']]
-            if dataDict['arm'] == 'right':
-                cmd_rpy = Rotation.RPY(dataDict['pitch'], -1 * dataDict['yaw'] + np.pi, dataDict['roll'] - (np.pi / 4))
-                cmd_xyz = Vector(dataDict['x'] + 0.1, dataDict['y'] - 0.1, dataDict['z'] - 1.3)
+        data_dict = json.loads(data)
+        if data_dict['camera'] == 'true':
+            ecm.servo_jp([data_dict['yaw'], data_dict['pitch'], data_dict['insert'], data_dict['roll']])
+        elif 'x' in data_dict:
+            robot_arm = psm_arms[data_dict['arm']]
+            if data_dict['arm'] == 'right':
+                cmd_rpy = Rotation.RPY( data_dict['pitch'], -1 * data_dict['yaw'] + np.pi, data_dict['roll'] - (np.pi / 4))
+                cmd_xyz = Vector(data_dict['x'] + 0.1, data_dict['y'] - 0.1, data_dict['z'] - 1.3)
                 robot_arm.servo_cp(Frame(cmd_rpy, cmd_xyz))
+                if data_dict['slider'] != cur_slider_right:
+                    robot_arm.set_jaw_angle(data_dict['slider'])
+                    cur_slider_right = data_dict['slider']
             else:
-                cmd_rpy = Rotation.RPY(-1 * dataDict['pitch'],
-                                       dataDict['yaw'], dataDict['roll'] + (np.pi / 4))
-                cmd_xyz = Vector(dataDict['x'], dataDict['y'], dataDict['z'] - 1.3)
+                cmd_rpy = Rotation.RPY(-1 * data_dict['pitch'], data_dict['yaw'], data_dict['roll'] + (np.pi / 4))
+                cmd_xyz = Vector(data_dict['x'], data_dict['y'], data_dict['z'] - 1.3)
                 robot_arm.servo_cp(Frame(cmd_rpy, cmd_xyz))
-            if dataDict['slider'] != cur_slider:
-                robot_arm.set_jaw_angle(dataDict['slider'])
-                cur_slider = dataDict['slider']
+                if data_dict['slider'] != cur_slider_left:
+                    robot_arm.set_jaw_angle(data_dict['slider'])
+                    cur_slider_left = data_dict['slider']
     rate.sleep()
